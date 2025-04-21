@@ -88,6 +88,21 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.numbers),
+            tooltip: 'Change Modes',
+            onPressed: () {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('This should change the modes')));
+            },
+            onLongPress: () {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('This is numbers mode.')));
+            },
+          ),],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -110,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             if(_randomValue == null)...[
               Text(
-              'Press the random button \n "?"',
+              'Press the random button \n "Dice Button"',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
@@ -128,17 +143,8 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _pickRandom,
         tooltip: 'Pick Random',
-        child: const Icon(Icons.question_mark_rounded),
+        child: const Icon(Icons.casino_rounded),
       ), // This trailing comma makes auto-formatting nicer for build methods.
-      persistentFooterButtons:[
-        Row( mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-              'Numbers Mode',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-        ],)
-      ]
     );
   }
 }
