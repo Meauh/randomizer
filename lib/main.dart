@@ -56,20 +56,76 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String? _randomValue;
+  int activeMode = 0;
+  static const List<(String name, String mode, String description, Icon icon)>
+  modes = [
+    (
+      "Numbers",
+      "int",
+      "integer number from 0 to 99.",
+      Icon(Icons.sixty_fps_rounded),
+    ),
+    (
+      "Order",
+      "order",
+      "integer number from 1 to 10.",
+      Icon(Icons.looks_one_rounded),
+    ),
+    ("Dice", "dice", "integer number from 1 to 6.", Icon(Icons.casino_rounded)),
+    (
+      "Letters",
+      "caract",
+      "letter from the alphabet.",
+      Icon(Icons.title_rounded),
+    ),
+    ("Words", "word", "word (English).", Icon(Icons.raw_on_rounded)),
+    (
+      "Colors",
+      "color",
+      "color from the seven colors.",
+      Icon(Icons.palette_rounded),
+    ),
+    ("Images", "img", "image from pintrest.", Icon(Icons.landscape_rounded)),
+    (
+      "Videos",
+      "vid",
+      "video from youtube playlist.",
+      Icon(Icons.ondemand_video_rounded),
+    ),
+  ];
 
   void _pickRandom() {
+    String currentMode = "int";
+    currentMode = modes[activeMode].$2;
+      
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
       // _randomValue without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _pickRandomInt();
+      switch (currentMode){
+        case "int": _pickRandomInt();
+        break;
+        case "order": _pickRandomOrder();
+        break;
+        case "dice": _pickRandomDice();
+        break;
+        default: _pickRandomInt();
+        break;
+      }
     });
   }
 
-  void _pickRandomInt() => _randomValue = Random().nextInt(100).toString();
+  void _changeMode({int modeIndex = 0}){
+    setState(() {
+      activeMode = modeIndex;
+    });
+  }
 
+  void _pickRandomOrder() => _randomValue = (Random().nextInt(10)+1).toString();
+  void _pickRandomDice() => _randomValue = (Random().nextInt(6)+1).toString();
+  void _pickRandomInt() => _randomValue = Random().nextInt(100).toString();
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +136,69 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.amberAccent),
+              child: Text('Picking Type'),
+            ),
+            ListTile(
+              leading: modes[0].$4,
+              title: Text(modes[0].$1),
+              subtitle: Text('Random ${modes[0].$3}'),
+              selected: activeMode == 0,
+              onTap: () => _changeMode(modeIndex: 0),
+            ),
+            ListTile(
+              leading: modes[1].$4,
+              title: Text(modes[1].$1),
+              subtitle: Text('Random ${modes[1].$3}'),
+              selected: activeMode == 1,
+              onTap: () => _changeMode(modeIndex: 1),
+              // enabled: false,
+            ),
+            ListTile(
+              leading: modes[2].$4,
+              title: Text(modes[2].$1),
+              subtitle: Text('Random ${modes[2].$3}'),
+              selected: activeMode == 2,
+              onTap: () => _changeMode(modeIndex: 2),
+              // enabled: false,
+            ),
+            ListTile(
+              leading: modes[3].$4,
+              title: Text(modes[3].$1),
+              subtitle: Text('Random ${modes[3].$3}'),
+              enabled: false,
+            ),
+            ListTile(
+              leading: modes[4].$4,
+              title: Text(modes[4].$1),
+              subtitle: Text('Random ${modes[4].$3}'),
+              enabled: false,
+            ),
+            ListTile(
+              leading: modes[5].$4,
+              title: Text(modes[5].$1),
+              subtitle: Text('Random ${modes[5].$3}'),
+              enabled: false,
+            ),
+            ListTile(
+              leading: modes[6].$4,
+              title: Text(modes[6].$1),
+              subtitle: Text('Random ${modes[6].$3}'),
+              enabled: false,
+            ),
+            ListTile(
+              leading: modes[7].$4,
+              title: Text(modes[7].$1),
+              subtitle: Text('Random ${modes[7].$3}'),
+              enabled: false,
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
@@ -90,19 +209,26 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.numbers),
-            tooltip: 'Change Modes',
+            icon: modes[activeMode].$4,
+            tooltip: '${modes[activeMode].$1} mode',
             onPressed: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('This should change the modes')));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '${modes[activeMode].$1} mode: pick random ${modes[activeMode].$3}',
+                  ),
+                ),
+              );
             },
             onLongPress: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('This is numbers mode.')));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Open side menu to change modes.'),
+                ),
+              );
             },
-          ),],
+          ),
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -123,20 +249,19 @@ class _MyHomePageState extends State<MyHomePage> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            if(_randomValue == null)...[
+            if (_randomValue == null) ...[
               Text(
-              'Press the random button \n "Dice Button"',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            ]
-            else...[
+                'Press the random button \n "Dice Button"',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ] else ...[
               const Text('Your pick is:'),
-            Text(
-              _randomValue ?? 'Not picked',
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
-            ]
+              Text(
+                _randomValue ?? 'Not picked',
+                style: Theme.of(context).textTheme.displayMedium,
+              ),
+            ],
           ],
         ),
       ),
