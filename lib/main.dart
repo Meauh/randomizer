@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:word_generator/word_generator.dart';
 
 void main() {
   runApp(const MyApp());
@@ -57,6 +58,19 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String? _randomValue;
   int activeMode = 0;
+
+  final wordGenerator = WordGenerator();
+
+  static const List<String> colors = [
+    "Red",
+    "Blue",
+    "Green",
+    "Yellow",
+    "Black",
+    "Purple",
+    "Brown",
+    "Orange",
+  ];
   static const List<(String name, String mode, String description, Icon icon)>
   modes = [
     (
@@ -78,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "letter from the alphabet.",
       Icon(Icons.title_rounded),
     ),
-    ("Words", "word", "word (English).", Icon(Icons.raw_on_rounded)),
+    ("Words", "word", "english verbe.", Icon(Icons.raw_on_rounded)),
     (
       "Colors",
       "color",
@@ -92,40 +106,68 @@ class _MyHomePageState extends State<MyHomePage> {
       "video from youtube playlist.",
       Icon(Icons.ondemand_video_rounded),
     ),
+    ("Coin", "coin", "heads or tails.", Icon(Icons.paid_rounded)),
   ];
 
   void _pickRandom() {
     String currentMode = "int";
     currentMode = modes[activeMode].$2;
-      
+
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
       // _randomValue without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      switch (currentMode){
-        case "int": _pickRandomInt();
-        break;
-        case "order": _pickRandomOrder();
-        break;
-        case "dice": _pickRandomDice();
-        break;
-        default: _pickRandomInt();
-        break;
+      switch (currentMode) {
+        case "int":
+          _pickRandomInt();
+          break;
+        case "order":
+          _pickRandomOrder();
+          break;
+        case "dice":
+          _pickRandomDice();
+          break;
+        case "caract":
+          _pickRandomCaracter();
+          break;
+        case "word":
+          _pickRandomWord();
+          break;
+        case "color":
+          _pickRandomColor();
+          break;
+        default:
+          _pickRandomInt();
+          break;
       }
     });
   }
 
-  void _changeMode({int modeIndex = 0}){
+  void _changeMode({int modeIndex = 0}) {
     setState(() {
       activeMode = modeIndex;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Picking type set to: ${modes[activeMode].$1}.',
+          ),
+        ),
+      );
     });
   }
 
-  void _pickRandomOrder() => _randomValue = (Random().nextInt(10)+1).toString();
-  void _pickRandomDice() => _randomValue = (Random().nextInt(6)+1).toString();
+  void _pickRandomOrder() =>
+      _randomValue = (Random().nextInt(10) + 1).toString();
+  void _pickRandomDice() => _randomValue = (Random().nextInt(6) + 1).toString();
   void _pickRandomInt() => _randomValue = Random().nextInt(100).toString();
+  void _pickRandomCaracter() =>
+      _randomValue = wordGenerator.randomName().substring(0, 1);
+  void _pickRandomWord() => _randomValue = wordGenerator.randomVerb();
+  void _pickRandomColor() =>
+      _randomValue = colors[Random().nextInt(colors.length)];
 
   @override
   Widget build(BuildContext context) {
@@ -170,30 +212,40 @@ class _MyHomePageState extends State<MyHomePage> {
               leading: modes[3].$4,
               title: Text(modes[3].$1),
               subtitle: Text('Random ${modes[3].$3}'),
-              enabled: false,
+              selected: activeMode == 3,
+              onTap: () => _changeMode(modeIndex: 3),
+              // enabled: false,
             ),
             ListTile(
               leading: modes[4].$4,
               title: Text(modes[4].$1),
               subtitle: Text('Random ${modes[4].$3}'),
-              enabled: false,
+              selected: activeMode == 4,
+              onTap: () => _changeMode(modeIndex: 4),
+              // enabled: false,
             ),
             ListTile(
               leading: modes[5].$4,
               title: Text(modes[5].$1),
               subtitle: Text('Random ${modes[5].$3}'),
-              enabled: false,
+              selected: activeMode == 5,
+              onTap: () => _changeMode(modeIndex: 5),
+              // enabled: false,
             ),
             ListTile(
               leading: modes[6].$4,
               title: Text(modes[6].$1),
               subtitle: Text('Random ${modes[6].$3}'),
+              selected: activeMode == 6,
+              onTap: () => _changeMode(modeIndex: 6),
               enabled: false,
             ),
             ListTile(
               leading: modes[7].$4,
               title: Text(modes[7].$1),
               subtitle: Text('Random ${modes[7].$3}'),
+              selected: activeMode == 7,
+              onTap: () => _changeMode(modeIndex: 7),
               enabled: false,
             ),
           ],
@@ -251,7 +303,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             if (_randomValue == null) ...[
               Text(
-                'Press the random button \n "Dice Button"',
+                'Press the random button \n "Roll the Dice"',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
