@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "Numbers",
       "int",
       "integer number from 0 to 99.",
-      Icon(Icons.sixty_fps_rounded),
+      Icon(Icons.pin_rounded),
     ),
     (
       "Order",
@@ -90,16 +90,16 @@ class _MyHomePageState extends State<MyHomePage> {
       "Letters",
       "caract",
       "letter from the alphabet.",
-      Icon(Icons.title_rounded),
+      Icon(Icons.explicit_rounded),
     ),
-    ("Words", "word", "english verbe.", Icon(Icons.raw_on_rounded)),
+    ("Words", "word", "english verbe.", Icon(Icons.fiber_pin_rounded)),
     (
       "Colors",
       "color",
       "color from the seven colors.",
       Icon(Icons.palette_rounded),
     ),
-    ("Images", "img", "image from pintrest.", Icon(Icons.landscape_rounded)),
+    ("Images", "img", "image from pexels or unsplash.", Icon(Icons.panorama)),
     (
       "Videos",
       "vid",
@@ -182,6 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           children: [
             const DrawerHeader(
+              curve: Curves.fastOutSlowIn,
               decoration: BoxDecoration(color: Colors.amberAccent),
               child: Text('Picking Type'),
             ),
@@ -192,14 +193,14 @@ class _MyHomePageState extends State<MyHomePage> {
               selected: activeMode == 0,
               onTap: () => _changeMode(modeIndex: 0),
             ),
-            ListTile(
-              leading: modes[1].$4,
-              title: Text(modes[1].$1),
-              subtitle: Text('Random ${modes[1].$3}'),
-              selected: activeMode == 1,
-              onTap: () => _changeMode(modeIndex: 1),
-              // enabled: false,
-            ),
+            // ListTile(
+            //   leading: modes[1].$4,
+            //   title: Text(modes[1].$1),
+            //   subtitle: Text('Random ${modes[1].$3}'),
+            //   selected: activeMode == 1,
+            //   onTap: () => _changeMode(modeIndex: 1),
+            //   // enabled: false,
+            // ),
             ListTile(
               leading: modes[2].$4,
               title: Text(modes[2].$1),
@@ -303,10 +304,11 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             if (_randomValue == null) ...[
               Text(
-                'Press the random button \n "Roll the Dice"',
+                '"Roll the Dice"\n To get your next pick.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
+              // Text('${modes[activeMode].$1} type',textAlign: TextAlign.center,style: Theme.of(context).textTheme.labelMedium,              ),
             ] else ...[
               const Text('Your pick is:'),
               Text(
@@ -317,10 +319,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: _pickRandom,
-        tooltip: 'Pick Random',
-        child: const Icon(Icons.casino_rounded),
+        tooltip: "Random ${modes[activeMode].$1}",
+        label: Text('Pick'),
+        icon: Icon(Icons.casino_rounded),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
