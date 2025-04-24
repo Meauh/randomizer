@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:word_generator/word_generator.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 
 void main() {
   runApp(const MyApp());
@@ -73,12 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
   static const List<(String name, String mode, String description, Icon icon)>
   modes = [
-    (
-      "Numbers",
-      "int",
-      "integer number from 0 to 99.",
-      Icon(Icons.pin_rounded),
-    ),
+    ("Numbers", "int", "integer number from 0 to 99.", Icon(Icons.pin_rounded)),
     (
       "Order",
       "order",
@@ -98,6 +97,12 @@ class _MyHomePageState extends State<MyHomePage> {
       "color",
       "color from the seven colors.",
       Icon(Icons.palette_rounded),
+    ),
+    (
+      "Items",
+      "file",
+      "item from your cotume list (file).",
+      Icon(Icons.upload_file_rounded),
     ),
     ("Images", "img", "image from pexels or unsplash.", Icon(Icons.panorama)),
     (
@@ -138,6 +143,9 @@ class _MyHomePageState extends State<MyHomePage> {
         case "color":
           _pickRandomColor();
           break;
+        case "file":
+          _pickRandomFromFile();
+          break;
         default:
           _pickRandomInt();
           break;
@@ -149,13 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       activeMode = modeIndex;
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Picking type set to: ${modes[activeMode].$1}.',
-          ),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Picking type set to: ${modes[activeMode].$1}.'),),);
     });
   }
 
@@ -168,6 +170,53 @@ class _MyHomePageState extends State<MyHomePage> {
   void _pickRandomWord() => _randomValue = wordGenerator.randomVerb();
   void _pickRandomColor() =>
       _randomValue = colors[Random().nextInt(colors.length)];
+  Future<void> _pickRandomFromFile() async {
+    var list = await pickAndLoadStringListFromJson();
+    if (list != null && list.isNotEmpty) {
+      setState(() {
+        _randomValue = list[Random().nextInt(list.length)];
+      });
+    }
+  }
+
+  Future<List<String>?> pickAndLoadStringListFromJson() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        withData: true, // Required for Web to get .bytes
+      );
+
+      if (result == null) return null;
+
+      String jsonString;
+
+      if (kIsWeb) {
+        // ✅ Web: use .bytes
+        final bytes = result.files.single.bytes;
+        if (bytes == null) return null;
+        jsonString = utf8.decode(bytes);
+      } else {
+        // ✅ Mobile/Desktop: use file path
+        final path = result.files.single.path;
+        if (path == null) return null;
+        final file = File(path);
+        jsonString = await file.readAsString();
+      }
+
+      // Decode the JSON string into List<String>
+      final decoded = json.decode(jsonString);
+      if (decoded is List) {
+        return decoded.cast<String>();
+      } else {
+        print("JSON format not valid (not a list)");
+        return null;
+      }
+    } catch (e) {
+      print("Error reading JSON file: $e");
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +288,7 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: Text('Random ${modes[6].$3}'),
               selected: activeMode == 6,
               onTap: () => _changeMode(modeIndex: 6),
-              enabled: false,
+              // enabled: false,
             ),
             ListTile(
               leading: modes[7].$4,
@@ -247,6 +296,14 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: Text('Random ${modes[7].$3}'),
               selected: activeMode == 7,
               onTap: () => _changeMode(modeIndex: 7),
+              enabled: false,
+            ),
+            ListTile(
+              leading: modes[8].$4,
+              title: Text(modes[8].$1),
+              subtitle: Text('Random ${modes[8].$3}'),
+              selected: activeMode == 8,
+              onTap: () => _changeMode(modeIndex: 8),
               enabled: false,
             ),
           ],
