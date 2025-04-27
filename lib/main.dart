@@ -63,8 +63,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String? _randomValue;
   int activeMode = 0;
+  List<String> listFromFile = [];
 
   final wordGenerator = WordGenerator();
+  final passGenerator = PasswordGenerator();
 
   static const List<String> colors = [
     "Red",
@@ -105,6 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "item from your cotume list (file).",
       Icon(Icons.upload_file_rounded),
     ),
+    ("Password", "pass", "password.", Icon(Icons.password_rounded)),
     ("Images", "img", "image from pexels or unsplash.", Icon(Icons.panorama)),
     (
       "Videos",
@@ -148,6 +151,9 @@ class _MyHomePageState extends State<MyHomePage> {
         case "file":
           _pickRandomFromFile();
           break;
+        case "pass":
+          _pickRandomPass();
+          break;
         case "img":
           _pickRandomImage();
           break;
@@ -162,6 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       activeMode = modeIndex;
       _randomValue = null;
+      listFromFile = [];
       Navigator.pop(context);
       // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Picking type set to: ${modes[activeMode].$1}.'),),);
     });
@@ -174,15 +181,17 @@ class _MyHomePageState extends State<MyHomePage> {
   void _pickRandomCaracter() =>
       _randomValue = wordGenerator.randomName().substring(0, 1);
   void _pickRandomWord() => _randomValue = wordGenerator.randomVerb();
+  void _pickRandomPass() => _randomValue = passGenerator.generatePassword();
   void _pickRandomColor() =>
       _randomValue = colors[Random().nextInt(colors.length)];
   Future<void> _pickRandomFromFile() async {
-    var list = await pickAndLoadStringListFromJson();
-    if (list != null && list.isNotEmpty) {
-      setState(() {
-        _randomValue = list[Random().nextInt(list.length)];
-      });
+    if (listFromFile.isEmpty) {
+      var list = await pickAndLoadStringListFromJson();
+      listFromFile = list!.toList(growable: false);
     }
+    setState(() {
+      _randomValue = listFromFile[Random().nextInt(listFromFile.length)];
+    });
   }
 
   Future<void> _pickRandomImage() async {
@@ -271,34 +280,26 @@ class _MyHomePageState extends State<MyHomePage> {
             const DrawerHeader(
               curve: Curves.fastOutSlowIn,
               decoration: BoxDecoration(color: Colors.amberAccent),
-              child: Text('Picking Type'),
+              child: Text('Randomizing Modes'),
             ),
             ListTile(
               leading: modes[0].$4,
-              title: Text(modes[0].$1),
+              title: Text('${modes[0].$1} mode'),
               subtitle: Text('Random ${modes[0].$3}'),
               selected: activeMode == 0,
               onTap: () => _changeMode(modeIndex: 0),
             ),
-            // ListTile(
-            //   leading: modes[1].$4,
-            //   title: Text(modes[1].$1),
-            //   subtitle: Text('Random ${modes[1].$3}'),
-            //   selected: activeMode == 1,
-            //   onTap: () => _changeMode(modeIndex: 1),
-            //   // enabled: false,
-            // ),
-            ListTile(
+            /*ListTile(
               leading: modes[2].$4,
-              title: Text(modes[2].$1),
+              title: Text('${modes[2].$1} mode'),
               subtitle: Text('Random ${modes[2].$3}'),
               selected: activeMode == 2,
               onTap: () => _changeMode(modeIndex: 2),
               // enabled: false,
-            ),
+            ),*/
             ListTile(
               leading: modes[3].$4,
-              title: Text(modes[3].$1),
+              title: Text('${modes[3].$1} mode'),
               subtitle: Text('Random ${modes[3].$3}'),
               selected: activeMode == 3,
               onTap: () => _changeMode(modeIndex: 3),
@@ -306,7 +307,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: modes[4].$4,
-              title: Text(modes[4].$1),
+              title: Text('${modes[4].$1} mode'),
               subtitle: Text('Random ${modes[4].$3}'),
               selected: activeMode == 4,
               onTap: () => _changeMode(modeIndex: 4),
@@ -314,7 +315,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: modes[5].$4,
-              title: Text(modes[5].$1),
+              title: Text('${modes[5].$1} mode'),
               subtitle: Text('Random ${modes[5].$3}'),
               selected: activeMode == 5,
               onTap: () => _changeMode(modeIndex: 5),
@@ -322,7 +323,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: modes[6].$4,
-              title: Text(modes[6].$1),
+              title: Text('${modes[6].$1} mode'),
               subtitle: Text('Random ${modes[6].$3}'),
               selected: activeMode == 6,
               onTap: () => _changeMode(modeIndex: 6),
@@ -330,7 +331,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: modes[7].$4,
-              title: Text(modes[7].$1),
+              title: Text('${modes[7].$1} mode'),
               subtitle: Text('Random ${modes[7].$3}'),
               selected: activeMode == 7,
               onTap: () => _changeMode(modeIndex: 7),
@@ -338,7 +339,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: modes[8].$4,
-              title: Text(modes[8].$1),
+              title: Text('${modes[8].$1} mode'),
+              subtitle: Text('Random ${modes[8].$3}'),
+              selected: activeMode == 8,
+              onTap: () => _changeMode(modeIndex: 8),
+              enabled: false,
+            ),
+            ListTile(
+              leading: modes[8].$4,
+              title: Text('${modes[8].$1} mode'),
               subtitle: Text('Random ${modes[8].$3}'),
               selected: activeMode == 8,
               onTap: () => _changeMode(modeIndex: 8),
@@ -356,7 +365,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
         actions: <Widget>[
-          IconButton(
+          /*IconButton(
             icon: modes[activeMode].$4,
             tooltip: '${modes[activeMode].$1} mode',
             onPressed: () {
@@ -375,7 +384,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             },
-          ),
+          ),*/
         ],
       ),
       body: Center(
@@ -417,6 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ] else ...[
                 Text(
                   _randomValue ?? 'Not picked',
+                  textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.displayMedium,
                 ),
               ],
@@ -428,7 +438,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _pickRandom,
         tooltip: "Random ${modes[activeMode].$1}",
         label: Text('Pick'),
-        icon: Icon(Icons.casino_rounded),
+        icon: modes[activeMode].$4,
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
