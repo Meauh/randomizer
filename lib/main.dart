@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -118,6 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
     String currentMode = "int";
     currentMode = modes[activeMode].$2;
 
+    //TODO Fix double setState
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -146,6 +148,9 @@ class _MyHomePageState extends State<MyHomePage> {
         case "file":
           _pickRandomFromFile();
           break;
+        case "img":
+          _pickRandomImage();
+          break;
         default:
           _pickRandomInt();
           break;
@@ -156,6 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _changeMode({int modeIndex = 0}) {
     setState(() {
       activeMode = modeIndex;
+      _randomValue = null;
       Navigator.pop(context);
       // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Picking type set to: ${modes[activeMode].$1}.'),),);
     });
@@ -179,7 +185,37 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> _pickRandomImage() async {
+    //TODO Secure accessKey
+    const accessKey = ''; //TODO Access key is missing
+    const url = 'https://api.unsplash.com/photos/random?client_id=$accessKey';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final imageUrl = data['urls']['regular']; // or 'full', 'thumb'
+
+        //TODO Snackbar here
+        print('Random image: $imageUrl');
+        setState(() {
+          _randomValue = imageUrl;
+        });
+        //TODO Snackbar here
+        print('Random value: $_randomValue');
+      } else {
+        //TODO Snackbar here
+        print('Failed to load image: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching image: $e');
+    }
+  }
+
   Future<List<String>?> pickAndLoadStringListFromJson() async {
+    //TODO Save list of strings
+    //TODO Test if list saved
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -209,10 +245,12 @@ class _MyHomePageState extends State<MyHomePage> {
       if (decoded is List) {
         return decoded.cast<String>();
       } else {
+        //TODO Snackbar here
         print("JSON format not valid (not a list)");
         return null;
       }
     } catch (e) {
+      //TODO Snackbar here
       print("Error reading JSON file: $e");
       return null;
     }
@@ -296,7 +334,7 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: Text('Random ${modes[7].$3}'),
               selected: activeMode == 7,
               onTap: () => _changeMode(modeIndex: 7),
-              enabled: false,
+              // enabled: false,
             ),
             ListTile(
               leading: modes[8].$4,
@@ -368,10 +406,20 @@ class _MyHomePageState extends State<MyHomePage> {
               // Text('${modes[activeMode].$1} type',textAlign: TextAlign.center,style: Theme.of(context).textTheme.labelMedium,              ),
             ] else ...[
               const Text('Your pick is:'),
-              Text(
-                _randomValue ?? 'Not picked',
-                style: Theme.of(context).textTheme.displayMedium,
-              ),
+              if (modes[activeMode].$2 == "img") ...[
+                _randomValue != null
+                    ? Image.network(
+                      _randomValue!,
+                      fit: BoxFit.fill,
+                      height: 500,
+                    )
+                    : const Text('No image yet'),
+              ] else ...[
+                Text(
+                  _randomValue ?? 'Not picked',
+                  style: Theme.of(context).textTheme.displayMedium,
+                ),
+              ],
             ],
           ],
         ),
