@@ -6,6 +6,8 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(const MyApp());
@@ -206,29 +208,34 @@ class _MyHomePageState extends State<MyHomePage> {
         final data = json.decode(response.body);
         final imageUrl = data['urls']['regular']; // or 'full', 'thumb'
 
-        //TODO Snackbar here
-        print('Random image: $imageUrl');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Random image: $imageUrl')));
         setState(() {
           _randomValue = imageUrl;
         });
-        //TODO Snackbar here
-        print('Random value: $_randomValue');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Random value: $_randomValue')));
       } else {
-        //TODO Snackbar here
-        print('Failed to load image: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load image: ${response.statusCode}'),
+          ),
+        );
       }
     } catch (e) {
-      print('Error fetching image: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error fetching image: $e')));
     }
   }
 
   Future<List<String>?> pickAndLoadStringListFromJson() async {
     //TODO Save list of strings
-    //TODO Test if list saved
     try {
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['json'],
+        type: FileType.any,
         withData: true, // Required for Web to get .bytes
       );
 
@@ -254,13 +261,15 @@ class _MyHomePageState extends State<MyHomePage> {
       if (decoded is List) {
         return decoded.cast<String>();
       } else {
-        //TODO Snackbar here
-        print("JSON format not valid (not a list)");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("JSON format not valid (not a list)")),
+        );
         return null;
       }
     } catch (e) {
-      //TODO Snackbar here
-      print("Error reading JSON file: $e");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error reading JSON file: $e")));
       return null;
     }
   }
@@ -353,6 +362,14 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () => _changeMode(modeIndex: 8),
               enabled: false,
             ),
+            Divider(indent: 12, endIndent: 12),
+            ListTile(
+              leading: Icon(Icons.code_rounded),
+              title: Text('Meauh @Github'),
+              subtitle: Text("Discover more on the Developer’s Page. \nApp Version: 0.0.0+1"),
+              trailing: Icon(Icons.keyboard_arrow_right_rounded),
+              onTap: () => launchUrl(Uri.parse('https://github.com/Meauh')),
+            ),
           ],
         ),
       ),
@@ -424,10 +441,22 @@ class _MyHomePageState extends State<MyHomePage> {
                     )
                     : const Text('No image yet'),
               ] else ...[
-                Text(
-                  _randomValue ?? 'Not picked',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displayMedium,
+                InkWell(
+                  onLongPress: () async {
+                    await Clipboard.setData(
+                      ClipboardData(text: _randomValue.toString()),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Your pick copied in the clipboard.'),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    _randomValue ?? 'Not picked',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
                 ),
               ],
             ],
