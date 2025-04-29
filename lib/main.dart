@@ -106,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
     (
       "Items",
       "file",
-      "item from your cotume list (file).",
+      "item from your costume file (.json contain list of strings).",
       Icon(Icons.upload_file_rounded),
     ),
     ("Password", "pass", "password.", Icon(Icons.password_rounded)),
@@ -189,7 +189,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _pickRandomFromFile() async {
     if (listFromFile.isEmpty) {
       var list = await pickAndLoadStringListFromJson();
-      listFromFile = list!.toList(growable: false);
+      if (list == null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("No JSON file selected!")));
+        return;
+      }
+      listFromFile = list.toList(growable: false);
     }
     setState(() {
       _randomValue = listFromFile[Random().nextInt(listFromFile.length)];
@@ -274,6 +280,21 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void copyClipboard() async {
+    if (_randomValue == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Nothing to copy, you have to pick first.'),
+        ),
+      );
+    } else {
+      await Clipboard.setData(ClipboardData(text: _randomValue.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Your pick copied in the clipboard.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -286,11 +307,19 @@ class _MyHomePageState extends State<MyHomePage> {
       drawer: Drawer(
         child: ListView(
           children: [
-            const DrawerHeader(
-              curve: Curves.fastOutSlowIn,
-              decoration: BoxDecoration(color: Colors.amberAccent),
-              child: Text('Randomizing Modes'),
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.inversePrimary,
+              ),
+              child: ListTile(
+                leading: Icon(Icons.auto_awesome_motion_rounded),
+                title: Text('Randomizing Modes'),
+                subtitle: Text(
+                  'Pick your favorite mode to unlock the new use of randomization.',
+                ),
+              ),
             ),
+
             ListTile(
               leading: modes[0].$4,
               title: Text('${modes[0].$1} mode'),
@@ -298,14 +327,14 @@ class _MyHomePageState extends State<MyHomePage> {
               selected: activeMode == 0,
               onTap: () => _changeMode(modeIndex: 0),
             ),
-            /*ListTile(
+            ListTile(
               leading: modes[2].$4,
               title: Text('${modes[2].$1} mode'),
               subtitle: Text('Random ${modes[2].$3}'),
               selected: activeMode == 2,
               onTap: () => _changeMode(modeIndex: 2),
               // enabled: false,
-            ),*/
+            ),
             ListTile(
               leading: modes[3].$4,
               title: Text('${modes[3].$1} mode'),
@@ -331,14 +360,6 @@ class _MyHomePageState extends State<MyHomePage> {
               // enabled: false,
             ),
             ListTile(
-              leading: modes[6].$4,
-              title: Text('${modes[6].$1} mode'),
-              subtitle: Text('Random ${modes[6].$3}'),
-              selected: activeMode == 6,
-              onTap: () => _changeMode(modeIndex: 6),
-              // enabled: false,
-            ),
-            ListTile(
               leading: modes[7].$4,
               title: Text('${modes[7].$1} mode'),
               subtitle: Text('Random ${modes[7].$3}'),
@@ -347,6 +368,15 @@ class _MyHomePageState extends State<MyHomePage> {
               // enabled: false,
             ),
             ListTile(
+              leading: modes[6].$4,
+              title: Text('${modes[6].$1} mode'),
+              subtitle: Text('Random ${modes[6].$3}'),
+              selected: activeMode == 6,
+              onTap: () => _changeMode(modeIndex: 6),
+              // enabled: false,
+            ),
+            // Divider(indent: 24, endIndent: 24),
+            ListTile(
               leading: modes[8].$4,
               title: Text('${modes[8].$1} mode'),
               subtitle: Text('Random ${modes[8].$3}'),
@@ -355,20 +385,89 @@ class _MyHomePageState extends State<MyHomePage> {
               enabled: false,
             ),
             ListTile(
-              leading: modes[8].$4,
-              title: Text('${modes[8].$1} mode'),
-              subtitle: Text('Random ${modes[8].$3}'),
-              selected: activeMode == 8,
-              onTap: () => _changeMode(modeIndex: 8),
+              leading: modes[9].$4,
+              title: Text('${modes[9].$1} mode'),
+              subtitle: Text('Random ${modes[9].$3}'),
+              selected: activeMode == 9,
+              onTap: () => _changeMode(modeIndex: 9),
               enabled: false,
             ),
             Divider(indent: 12, endIndent: 12),
             ListTile(
-              leading: Icon(Icons.code_rounded),
+              leading: Icon(Icons.language_rounded),
+              title: Text('Costume Collections !'),
+              subtitle: Text(
+                "Want to try some exmaple of costume collections and it's power.",
+              ),
+              trailing: Icon(Icons.keyboard_arrow_right_rounded),
+              onTap:
+                  () => launchUrl(
+                    Uri.parse('https://github.com/Meauh/randomizer'),
+                  ),
+              /*onLongPress: () async {
+                await Clipboard.setData(
+                  ClipboardData(text: 'test'),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Test.', textAlign: TextAlign.center,),
+                  ),
+                );
+              },*/
+            ),
+            // Divider(indent: 12, endIndent: 12),
+            ListTile(
+              leading: Icon(Icons.shop_rounded),
+              title: Text('Next Pick @Playstore'),
+              subtitle: Text("App Version: 0.1.0"),
+              trailing: Icon(Icons.keyboard_arrow_right_rounded),
+              onTap:
+                  () => launchUrl(
+                    Uri.parse(
+                      'https://play.google.com/store/apps/details?id=com.bit.randomizer',
+                    ),
+                  ),
+              onLongPress: () async {
+                await Clipboard.setData(
+                  ClipboardData(
+                    text:
+                        'https://play.google.com/store/apps/details?id=com.bit.randomizer',
+                  ),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Playstore link copied in the clipboard.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              },
+            ),
+            // Divider(indent: 24, endIndent: 24),
+            ListTile(
+              leading: Image.network(
+                "https://logo.clearbit.com/github.com",
+                fit: BoxFit.fill,
+                height: 24,
+              ),
               title: Text('Meauh @Github'),
-              subtitle: Text("Discover more on the Developer’s Page. \nApp Version: 0.0.0+1"),
+              subtitle: Text("Discover more on the Developer’s Page."),
               trailing: Icon(Icons.keyboard_arrow_right_rounded),
               onTap: () => launchUrl(Uri.parse('https://github.com/Meauh')),
+              onLongPress: () async {
+                await Clipboard.setData(
+                  ClipboardData(text: 'https://github.com/Meauh'),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Dev github link copied in the clipboard.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -382,6 +481,11 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
         actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.content_paste_rounded),
+            tooltip: 'Copy to clipboard.',
+            onPressed: () => copyClipboard(),
+          ),
           /*IconButton(
             icon: modes[activeMode].$4,
             tooltip: '${modes[activeMode].$1} mode',
@@ -442,16 +546,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     : const Text('No image yet'),
               ] else ...[
                 InkWell(
-                  onLongPress: () async {
-                    await Clipboard.setData(
-                      ClipboardData(text: _randomValue.toString()),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Your pick copied in the clipboard.'),
-                      ),
-                    );
-                  },
+                  onLongPress: () => copyClipboard(),
                   child: Text(
                     _randomValue ?? 'Not picked',
                     textAlign: TextAlign.center,
