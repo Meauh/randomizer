@@ -90,6 +90,13 @@ class _MyHomePageState extends State<MyHomePage> {
       Icon(Icons.looks_one_rounded),
     ),
     ("Dice", "dice", "integer number from 1 to 6.", Icon(Icons.casino_rounded)),
+    ("Coin", "coin", "heads or tails.", Icon(Icons.paid_rounded)),
+    (
+      "Colors",
+      "color",
+      "color from the seven colors.",
+      Icon(Icons.palette_rounded),
+    ),
     (
       "Letters",
       "caract",
@@ -98,18 +105,18 @@ class _MyHomePageState extends State<MyHomePage> {
     ),
     ("Words", "word", "english verbe.", Icon(Icons.fiber_pin_rounded)),
     (
-      "Colors",
-      "color",
-      "color from the seven colors.",
-      Icon(Icons.palette_rounded),
+      "Quote",
+      "quote",
+      "quote from public API.",
+      Icon(Icons.format_quote_rounded),
     ),
+    ("Password", "pass", "password.", Icon(Icons.phonelink_lock_rounded)),
     (
       "Items",
       "file",
       "item from your costume file (.json contain list of strings).",
       Icon(Icons.upload_file_rounded),
     ),
-    ("Password", "pass", "password.", Icon(Icons.password_rounded)),
     ("Images", "img", "image from pexels or unsplash.", Icon(Icons.panorama)),
     (
       "Videos",
@@ -117,7 +124,6 @@ class _MyHomePageState extends State<MyHomePage> {
       "video from youtube playlist.",
       Icon(Icons.ondemand_video_rounded),
     ),
-    ("Coin", "coin", "heads or tails.", Icon(Icons.paid_rounded)),
   ];
 
   void _pickRandom() {
@@ -159,6 +165,12 @@ class _MyHomePageState extends State<MyHomePage> {
         case "img":
           _pickRandomImage();
           break;
+        case "quote":
+          _pickRandomQuote();
+          break;
+        case "coin":
+          _pickRandomCoin();
+          break;
         default:
           _pickRandomInt();
           break;
@@ -186,6 +198,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void _pickRandomPass() => _randomValue = passGenerator.generatePassword();
   void _pickRandomColor() =>
       _randomValue = colors[Random().nextInt(colors.length)];
+  void _pickRandomCoin() {
+    List<String> coinFaces = ["Heads", "Tails"];
+    _randomValue = coinFaces[Random().nextInt(2)];
+  }
+
   Future<void> _pickRandomFromFile() async {
     if (listFromFile.isEmpty) {
       var list = await pickAndLoadStringListFromJson();
@@ -234,6 +251,32 @@ class _MyHomePageState extends State<MyHomePage> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error fetching image: $e')));
+    }
+  }
+
+  Future<void> _pickRandomQuote() async {
+    const url = 'http://api.quotable.io/random';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final quoteBody = data['content'] + " - By " + data['author'];
+        setState(() {
+          _randomValue = quoteBody;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load quote: ${response.statusCode}'),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error fetching quote: $e')));
     }
   }
 
@@ -318,6 +361,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   'Pick your favorite mode to unlock the new use of randomization.',
                 ),
               ),
+              //TODO create new list button
             ),
 
             ListTile(
@@ -360,19 +404,19 @@ class _MyHomePageState extends State<MyHomePage> {
               // enabled: false,
             ),
             ListTile(
-              leading: modes[7].$4,
-              title: Text('${modes[7].$1} mode'),
-              subtitle: Text('Random ${modes[7].$3}'),
-              selected: activeMode == 7,
-              onTap: () => _changeMode(modeIndex: 7),
-              // enabled: false,
-            ),
-            ListTile(
               leading: modes[6].$4,
               title: Text('${modes[6].$1} mode'),
               subtitle: Text('Random ${modes[6].$3}'),
               selected: activeMode == 6,
               onTap: () => _changeMode(modeIndex: 6),
+              // enabled: false,
+            ),
+            ListTile(
+              leading: modes[7].$4,
+              title: Text('${modes[7].$1} mode'),
+              subtitle: Text('Random ${modes[7].$3}'),
+              selected: activeMode == 7,
+              onTap: () => _changeMode(modeIndex: 7),
               // enabled: false,
             ),
             // Divider(indent: 24, endIndent: 24),
@@ -382,7 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: Text('Random ${modes[8].$3}'),
               selected: activeMode == 8,
               onTap: () => _changeMode(modeIndex: 8),
-              enabled: false,
+              // enabled: false,
             ),
             ListTile(
               leading: modes[9].$4,
@@ -390,6 +434,22 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: Text('Random ${modes[9].$3}'),
               selected: activeMode == 9,
               onTap: () => _changeMode(modeIndex: 9),
+              // enabled: false,
+            ),
+            ListTile(
+              leading: modes[10].$4,
+              title: Text('${modes[10].$1} mode'),
+              subtitle: Text('Random ${modes[10].$3}'),
+              selected: activeMode == 10,
+              onTap: () => _changeMode(modeIndex: 10),
+              enabled: false,
+            ),
+            ListTile(
+              leading: modes[11].$4,
+              title: Text('${modes[11].$1} mode'),
+              subtitle: Text('Random ${modes[11].$3}'),
+              selected: activeMode == 11,
+              onTap: () => _changeMode(modeIndex: 11),
               enabled: false,
             ),
             Divider(indent: 12, endIndent: 12),
@@ -483,8 +543,11 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.content_paste_rounded),
-            tooltip: 'Copy to clipboard.',
-            onPressed: () => copyClipboard(),
+            tooltip:
+                (_randomValue != null)
+                    ? 'Copy to clipboard'
+                    : 'Pick something first',
+            onPressed: (_randomValue != null) ? copyClipboard : null,
           ),
           /*IconButton(
             icon: modes[activeMode].$4,
