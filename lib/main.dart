@@ -98,6 +98,12 @@ class _MyHomePageState extends State<MyHomePage> {
       Icon(Icons.palette_rounded),
     ),
     (
+      "Emojis",
+      "emoji",
+      "face emoji.",
+      Icon(Icons.emoji_emotions_rounded),
+    ),
+    (
       "Letters",
       "caract",
       "letter from the alphabet.",
@@ -120,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ("Images", "img", "image from pexels or unsplash.", Icon(Icons.panorama)),
     (
       "Videos",
-      "vid",
+      "yt",
       "video from youtube playlist.",
       Icon(Icons.ondemand_video_rounded),
     ),
@@ -171,6 +177,9 @@ class _MyHomePageState extends State<MyHomePage> {
         case "coin":
           _pickRandomCoin();
           break;
+        case "emoji":
+          _pickRandomEmoji();
+          break;
         default:
           _pickRandomInt();
           break;
@@ -201,6 +210,23 @@ class _MyHomePageState extends State<MyHomePage> {
   void _pickRandomCoin() {
     List<String> coinFaces = ["Heads", "Tails"];
     _randomValue = coinFaces[Random().nextInt(2)];
+  }
+  void _pickRandomEmoji() {
+    List<String> faceEmojis = [
+    "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
+    "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
+    "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🥸",
+    "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️",
+    "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡",
+    "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓",
+    "🤗", "🤔", "🫢", "🤭", "🫣", "🤫", "🤥", "😶", "😐", "😑",
+    "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤",
+    "😪", "😵", "😵‍💫", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒",
+    "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "💀", "☠️", "👻",
+    "👽", "👾", "🤖", "😺", "😸", "😹", "😻", "😼", "😽", "🙀",
+    "😿", "😾"
+    ];
+    _randomValue = faceEmojis[Random().nextInt(faceEmojis.length)];
   }
 
   Future<void> _pickRandomFromFile() async {
@@ -255,14 +281,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _pickRandomQuote() async {
-    const url = 'http://api.quotable.io/random';
+    const url = 'https://dummyjson.com/quotes/random';
 
     try {
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final quoteBody = data['content'] + " - By " + data['author'];
+        final quoteBody = '"${data['quote']}" \nBy ${data['author']}';
         setState(() {
           _randomValue = quoteBody;
         });
@@ -381,6 +407,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: modes[3].$4,
+              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent,),
               title: Text('${modes[3].$1} mode'),
               subtitle: Text('Random ${modes[3].$3}'),
               selected: activeMode == 3,
@@ -397,6 +424,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: modes[5].$4,
+              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent,),
               title: Text('${modes[5].$1} mode'),
               subtitle: Text('Random ${modes[5].$3}'),
               selected: activeMode == 5,
@@ -422,6 +450,7 @@ class _MyHomePageState extends State<MyHomePage> {
             // Divider(indent: 24, endIndent: 24),
             ListTile(
               leading: modes[8].$4,
+              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent,),
               title: Text('${modes[8].$1} mode'),
               subtitle: Text('Random ${modes[8].$3}'),
               selected: activeMode == 8,
@@ -442,7 +471,7 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: Text('Random ${modes[10].$3}'),
               selected: activeMode == 10,
               onTap: () => _changeMode(modeIndex: 10),
-              enabled: false,
+              // enabled: false,
             ),
             ListTile(
               leading: modes[11].$4,
@@ -450,6 +479,14 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: Text('Random ${modes[11].$3}'),
               selected: activeMode == 11,
               onTap: () => _changeMode(modeIndex: 11),
+              enabled: false,
+            ),
+            ListTile(
+              leading: modes[12].$4,
+              title: Text('${modes[12].$1} mode'),
+              subtitle: Text('Random ${modes[12].$3}'),
+              selected: activeMode == 12,
+              onTap: () => _changeMode(modeIndex: 12),
               enabled: false,
             ),
             Divider(indent: 12, endIndent: 12),
