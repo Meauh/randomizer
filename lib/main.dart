@@ -97,12 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "color from the seven colors.",
       Icon(Icons.palette_rounded),
     ),
-    (
-      "Emojis",
-      "emoji",
-      "face emoji.",
-      Icon(Icons.emoji_emotions_rounded),
-    ),
+    ("Emojis", "emoji", "face emoji.", Icon(Icons.emoji_emotions_rounded)),
     (
       "Letters",
       "caract",
@@ -211,20 +206,121 @@ class _MyHomePageState extends State<MyHomePage> {
     List<String> coinFaces = ["Heads", "Tails"];
     _randomValue = coinFaces[Random().nextInt(2)];
   }
+
   void _pickRandomEmoji() {
     List<String> faceEmojis = [
-    "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
-    "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
-    "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🥸",
-    "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️",
-    "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡",
-    "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓",
-    "🤗", "🤔", "🫢", "🤭", "🫣", "🤫", "🤥", "😶", "😐", "😑",
-    "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤",
-    "😪", "😵", "😵‍💫", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒",
-    "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "💀", "☠️", "👻",
-    "👽", "👾", "🤖", "😺", "😸", "😹", "😻", "😼", "😽", "🙀",
-    "😿", "😾"
+      "😀",
+      "😃",
+      "😄",
+      "😁",
+      "😆",
+      "😅",
+      "😂",
+      "🤣",
+      "😊",
+      "😇",
+      "🙂",
+      "🙃",
+      "😉",
+      "😌",
+      "😍",
+      "🥰",
+      "😘",
+      "😗",
+      "😙",
+      "😚",
+      "😋",
+      "😛",
+      "😝",
+      "😜",
+      "🤪",
+      "🤨",
+      "🧐",
+      "🤓",
+      "😎",
+      "🥸",
+      "🤩",
+      "🥳",
+      "😏",
+      "😒",
+      "😞",
+      "😔",
+      "😟",
+      "😕",
+      "🙁",
+      "☹️",
+      "😣",
+      "😖",
+      "😫",
+      "😩",
+      "🥺",
+      "😢",
+      "😭",
+      "😤",
+      "😠",
+      "😡",
+      "🤬",
+      "🤯",
+      "😳",
+      "🥵",
+      "🥶",
+      "😱",
+      "😨",
+      "😰",
+      "😥",
+      "😓",
+      "🤗",
+      "🤔",
+      "🫢",
+      "🤭",
+      "🫣",
+      "🤫",
+      "🤥",
+      "😶",
+      "😐",
+      "😑",
+      "😬",
+      "🙄",
+      "😯",
+      "😦",
+      "😧",
+      "😮",
+      "😲",
+      "🥱",
+      "😴",
+      "🤤",
+      "😪",
+      "😵",
+      "😵‍💫",
+      "🤐",
+      "🥴",
+      "🤢",
+      "🤮",
+      "🤧",
+      "😷",
+      "🤒",
+      "🤕",
+      "🤑",
+      "🤠",
+      "😈",
+      "👿",
+      "👹",
+      "👺",
+      "💀",
+      "☠️",
+      "👻",
+      "👽",
+      "👾",
+      "🤖",
+      "😺",
+      "😸",
+      "😹",
+      "😻",
+      "😼",
+      "😽",
+      "🙀",
+      "😿",
+      "😾",
     ];
     _randomValue = faceEmojis[Random().nextInt(faceEmojis.length)];
   }
@@ -245,7 +341,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> _pickRandomImage() async {
+  /*Future<void> _pickRandomImage() async {
     //TODO Secure accessKey
     const accessKey = ''; //TODO Access key is missing
     const url = 'https://api.unsplash.com/photos/random?client_id=$accessKey';
@@ -278,6 +374,14 @@ class _MyHomePageState extends State<MyHomePage> {
         context,
       ).showSnackBar(SnackBar(content: Text('Error fetching image: $e')));
     }
+  }*/
+  Future<void> _pickRandomImage() async {
+    // const accessKey = ''; //TODO Access key is missing
+    setState(() {
+      _randomValue =
+          "https://picsum.photos/850?random=${DateTime.now().millisecondsSinceEpoch}";
+    });
+    
   }
 
   Future<void> _pickRandomQuote() async {
@@ -407,7 +511,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: modes[3].$4,
-              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent,),
+              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent),
               title: Text('${modes[3].$1} mode'),
               subtitle: Text('Random ${modes[3].$3}'),
               selected: activeMode == 3,
@@ -424,7 +528,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: modes[5].$4,
-              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent,),
+              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent),
               title: Text('${modes[5].$1} mode'),
               subtitle: Text('Random ${modes[5].$3}'),
               selected: activeMode == 5,
@@ -450,7 +554,7 @@ class _MyHomePageState extends State<MyHomePage> {
             // Divider(indent: 24, endIndent: 24),
             ListTile(
               leading: modes[8].$4,
-              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent,),
+              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent),
               title: Text('${modes[8].$1} mode'),
               subtitle: Text('Random ${modes[8].$3}'),
               selected: activeMode == 8,
@@ -479,7 +583,7 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: Text('Random ${modes[11].$3}'),
               selected: activeMode == 11,
               onTap: () => _changeMode(modeIndex: 11),
-              enabled: false,
+              // enabled: false,
             ),
             ListTile(
               leading: modes[12].$4,
