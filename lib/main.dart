@@ -105,20 +105,31 @@ class _MyHomePageState extends State<MyHomePage> {
       Icon(Icons.explicit_rounded),
     ),
     ("Words", "word", "english verbe.", Icon(Icons.fiber_pin_rounded)),
+    ("Password", "pass", "password.", Icon(Icons.phonelink_lock_rounded)),
+    (
+      "Ayas",
+      "aya",
+      "aya in Arabic from public API.",
+      Icon(Icons.menu_book_rounded),
+    ),
     (
       "Quote",
       "quote",
       "quote from public API.",
       Icon(Icons.format_quote_rounded),
     ),
-    ("Password", "pass", "password.", Icon(Icons.phonelink_lock_rounded)),
+    (
+      "Images",
+      "img",
+      "image from public API (uses unsplash).",
+      Icon(Icons.panorama),
+    ),
     (
       "Items",
       "file",
       "item from your costume file (.json contain list of strings).",
       Icon(Icons.upload_file_rounded),
     ),
-    ("Images", "img", "image from pexels or unsplash.", Icon(Icons.panorama)),
     (
       "Videos",
       "yt",
@@ -174,6 +185,9 @@ class _MyHomePageState extends State<MyHomePage> {
           break;
         case "emoji":
           _pickRandomEmoji();
+          break;
+        case "aya":
+          _pickRandomAya();
           break;
         default:
           _pickRandomInt();
@@ -381,7 +395,32 @@ class _MyHomePageState extends State<MyHomePage> {
       _randomValue =
           "https://picsum.photos/850?random=${DateTime.now().millisecondsSinceEpoch}";
     });
-    
+  }
+
+  Future<void> _pickRandomAya() async {
+    String url =
+        'https://api.alquran.cloud/v1/ayah/${Random().nextInt(6236) + 1}';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final ayaBody =
+            '${data['data']['text']} \n${data['data']['surah']['name']} : ${data['data']['numberInSurah']}';
+        setState(() {
+          _randomValue = ayaBody;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load aya: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error fetching aya: $e')));
+    }
   }
 
   Future<void> _pickRandomQuote() async {
@@ -554,7 +593,6 @@ class _MyHomePageState extends State<MyHomePage> {
             // Divider(indent: 24, endIndent: 24),
             ListTile(
               leading: modes[8].$4,
-              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent),
               title: Text('${modes[8].$1} mode'),
               subtitle: Text('Random ${modes[8].$3}'),
               selected: activeMode == 8,
@@ -563,6 +601,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: modes[9].$4,
+              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent),
               title: Text('${modes[9].$1} mode'),
               subtitle: Text('Random ${modes[9].$3}'),
               selected: activeMode == 9,
@@ -571,6 +610,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: modes[10].$4,
+              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent),
               title: Text('${modes[10].$1} mode'),
               subtitle: Text('Random ${modes[10].$3}'),
               selected: activeMode == 10,
@@ -579,6 +619,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: modes[11].$4,
+              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent),
               title: Text('${modes[11].$1} mode'),
               subtitle: Text('Random ${modes[11].$3}'),
               selected: activeMode == 11,
@@ -591,7 +632,7 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: Text('Random ${modes[12].$3}'),
               selected: activeMode == 12,
               onTap: () => _changeMode(modeIndex: 12),
-              enabled: false,
+              // enabled: false,
             ),
             Divider(indent: 12, endIndent: 12),
             ListTile(
