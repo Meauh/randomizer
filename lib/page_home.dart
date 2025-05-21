@@ -99,6 +99,12 @@ class _PageHomeState extends State<PageHome> {
     ("Words", "word", "english verbe.", Icon(Icons.fiber_pin_rounded)),
     ("Password", "pass", "password.", Icon(Icons.phonelink_lock_rounded)),
     (
+      "Surah",
+      "surah",
+      "surah in Arabic from public API.",
+      Icon(Icons.book_rounded),
+    ),
+    (
       "Ayas",
       "aya",
       "aya in Arabic from public API.",
@@ -192,6 +198,9 @@ class _PageHomeState extends State<PageHome> {
           break;
         case "aya":
           _pickRandomAya();
+          break;
+        case "surah":
+          _pickRandomSurah();
           break;
         case "country":
           _pickRandomCountry();
@@ -418,6 +427,31 @@ class _PageHomeState extends State<PageHome> {
         final data = json.decode(response.body);
         final ayaBody =
             '${data['data']['text']} \n${data['data']['surah']['name']} : ${data['data']['numberInSurah']}';
+        setState(() {
+          _randomValue = ayaBody;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load aya: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error fetching aya: $e')));
+    }
+  }
+  Future<void> _pickRandomSurah() async {
+    String url =
+        'https://api.alquran.cloud/v1/surah/${Random().nextInt(114) + 1}';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final ayaBody =
+            '${data['data']['name']} (${data['data']['numberOfAyahs']}) \n${data['data']['revelationType']}';
         setState(() {
           _randomValue = ayaBody;
         });
@@ -1205,13 +1239,22 @@ class _PageHomeState extends State<PageHome> {
               onTap: () => _changeMode(modeIndex: 13),
               // enabled: false,
             ),
-            Divider(),
             ListTile(
               leading: modes[14].$4,
+              trailing: Icon(Icons.fiber_new_rounded, color: Colors.redAccent),
               title: Text('${modes[14].$1} mode'),
               subtitle: Text('Random ${modes[14].$3}'),
               selected: activeMode == 14,
               onTap: () => _changeMode(modeIndex: 14),
+              // enabled: false,
+            ),
+            Divider(),
+            ListTile(
+              leading: modes[15].$4,
+              title: Text('${modes[15].$1} mode'),
+              subtitle: Text('Random ${modes[15].$3}'),
+              selected: activeMode == 15,
+              onTap: () => _changeMode(modeIndex: 15),
               // enabled: false,
             ),
             Divider(indent: 12, endIndent: 12),
