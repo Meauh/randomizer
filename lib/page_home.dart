@@ -1409,7 +1409,7 @@ class _PageHomeState extends State<PageHome> {
                 _randomValue != null
                     ? Image.network(
                       _randomValue!,
-                      fit: BoxFit.fill,
+                      fit: BoxFit.fitWidth,
                       height: 500,
                     )
                     : const Text('No image yet'),
