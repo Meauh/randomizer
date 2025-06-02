@@ -11,7 +11,7 @@ class NextPickApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      // debugShowCheckedModeBanner: false,
       title: 'Next Pick',
       theme: _buildTheme(),
       home: const HomePage(),
@@ -53,10 +53,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Next Pick'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
       body: const PageHome(),
     );
   }

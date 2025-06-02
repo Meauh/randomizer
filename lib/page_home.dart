@@ -9,9 +9,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'model_mode.dart';
-import 'component_mode.dart';
-
 // =========================================================================
 // DOMAIN LAYER - Business Logic & Entities (Independent of external concerns)
 // =========================================================================
@@ -1028,6 +1025,7 @@ class _PageHomeState extends State<PageHome> {
 
     if (_currentResult == null) {
       return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             '"Roll the Dice"\nTo get your next pick.',
@@ -1045,6 +1043,7 @@ class _PageHomeState extends State<PageHome> {
     }
 
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text('Your pick is:'),
         const SizedBox(height: 16),
@@ -1053,9 +1052,9 @@ class _PageHomeState extends State<PageHome> {
             borderRadius: BorderRadius.circular(8),
             child: Image.network(
               (_currentResult as ImageResult).url,
-              fit: BoxFit.fitWidth,
-              height: 400,
-              loadingBuilder: (context, child, loadingProgress) {
+              fit: BoxFit.fitHeight,
+              width: 400,
+              loadingBuilder: (context, child, loadingProgress) { //TODO add loading state
                 if (loadingProgress == null) return child;
                 return SizedBox(
                   height: 400,
@@ -1090,24 +1089,31 @@ class _PageHomeState extends State<PageHome> {
             ),
           ),
         ] else ...[
-          GestureDetector(
-            onLongPress: _copyToClipboard,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-              ),
-              child: Text(
-                _currentResult.toString(),
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.displayMedium,
-              ),
-            ),
+          Expanded(
+  child: GestureDetector(
+    onLongPress: _copyToClipboard,
+    child: Center(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline,
           ),
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Text(
+            _currentResult.toString(),
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.displayMedium,
+          ),
+        ),
+      ),
+    ),
+  ),
+)
         ],
       ],
     );
@@ -1177,7 +1183,6 @@ class _PageHomeState extends State<PageHome> {
     return Scaffold(
       drawer: Drawer(child: _buildDrawerContent()),
       appBar: AppBar(
-        centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text("Next Pick"),
         actions: [
