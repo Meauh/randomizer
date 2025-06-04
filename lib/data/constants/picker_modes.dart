@@ -12,13 +12,13 @@ class PickerModes {
       category: PickerCategory.offline,
       icon: Icons.pin_rounded,
     ),
-    PickerMode(
+    /*PickerMode(
       id: 'order',
       name: 'Order',
       description: 'integer number from 1 to 10',
       category: PickerCategory.offline,
       icon: Icons.looks_one_rounded,
-    ),
+    ),*/
     PickerMode(
       id: 'dice',
       name: 'Dice',

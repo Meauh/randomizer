@@ -1,5 +1,7 @@
 // === DATA CONSTANTS (Configuration) ===
 class DataConstants {
+  static const String defaultPickerMode = "coin";
+
   static const List<String> colors = [
     "Red", "Blue", "Green", "Yellow", 
     "Black", "Purple", "Brown", "Orange"

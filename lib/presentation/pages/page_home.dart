@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:randomizer/domain/entities/user_preferences.dart';
+import 'package:randomizer/domain/usecases/save_active_mode_usecase.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:randomizer/domain/entities/picker_mode.dart';
 import 'package:randomizer/domain/entities/picker_result.dart';
 import 'package:randomizer/domain/usecases/get_picker_modes_usecase.dart';
 import 'package:randomizer/domain/usecases/pick_random_usecase.dart';
+import 'package:randomizer/domain/usecases/get_preferences_usecase.dart';
+import 'package:randomizer/data/repositories/preferences_repository.dart';
 import 'package:randomizer/data/repositories/picker_repository.dart';
 
 import 'package:randomizer/presentation/widgets/next_pick_widget.dart';
@@ -32,20 +36,27 @@ import 'package:randomizer/presentation/widgets/picker_mode_widget.dart';
 class _PageHomeState extends State<PageHome> {
   // State variables
   PickerResult? _currentResult;
-  String _currentModeId = 'flags';
+  late String _currentModeId = "flag";
   bool _isLoading = false;
 
   // Dependencies (injected in real app)
   late final PickRandomUseCase _pickRandomUseCase;
   late final GetPickerModesUseCase _getPickerModesUseCase;
+  late final GetPreferencesUseCase _getPreferencesUseCase;
+  late final SaveActiveModeUseCase _setActiveModeUseCase;
+  late final UserPreferences _userPreferences;
 
   @override
-  void initState() {
+  void initState() async {
     super.initState();
     // Dependency injection would happen here in a real app
-    final repository = PickerRepository();
-    _pickRandomUseCase = PickRandomUseCase(repository);
+    final pickerRepo = PickerRepository();
+    final prefRepo = PreferencesRepository();
+    _pickRandomUseCase = PickRandomUseCase(pickerRepo);
     _getPickerModesUseCase = GetPickerModesUseCase();
+    _setActiveModeUseCase = SaveActiveModeUseCase(prefRepo);
+    _getPreferencesUseCase = GetPreferencesUseCase(prefRepo);
+    _loadPreferences();
   }
 
   // Computed properties
@@ -54,6 +65,11 @@ class _PageHomeState extends State<PageHome> {
   );
 
   // Event handlers
+  Future<void> _loadPreferences() async {
+    _userPreferences = await _getPreferencesUseCase.execute();
+    _currentModeId = _userPreferences.activeMode;
+  }
+
   Future<void> _pickRandom() async {
     setState(() {
       _isLoading = true;
@@ -85,6 +101,7 @@ class _PageHomeState extends State<PageHome> {
     setState(() {
       _currentModeId = modeId;
       _currentResult = null;
+      _setActiveModeUseCase.execute(modeId);
     });
     Navigator.pop(context);
   }
@@ -163,19 +180,21 @@ class _PageHomeState extends State<PageHome> {
             ],
           ),
         ),
-        ...modes.sublist(0, modes.length - 1).map(
-          (mode) => WidgetPickerMode(
-            mode: mode,
-            status: _currentMode.id == mode.id,
-            onTap: () => _changeMode(mode.id),
-          ),
-        ),
+        ...modes
+            .sublist(0, modes.length - 1)
+            .map(
+              (mode) => WidgetPickerMode(
+                mode: mode,
+                status: _currentMode.id == mode.id,
+                onTap: () => _changeMode(mode.id),
+              ),
+            ),
         const Divider(),
         WidgetPickerMode(
-            mode: modes.last,
-            status: _currentMode.id == modes.last.id,
-            onTap: () => _changeMode(modes.last.id),
-          ),
+          mode: modes.last,
+          status: _currentMode.id == modes.last.id,
+          onTap: () => _changeMode(modes.last.id),
+        ),
         const Divider(),
         ListTile(
           leading: const Icon(Icons.language_rounded),
@@ -205,7 +224,8 @@ class _PageHomeState extends State<PageHome> {
           title: Text('Meauh @Github'),
           subtitle: Text("Discover more on the Developer’s Page."),
           trailing: Icon(Icons.keyboard_arrow_right_rounded),
-          onTap: () => launchUrl(Uri.parse('https://github.com/Meauh/randomizer')),
+          onTap:
+              () => launchUrl(Uri.parse('https://github.com/Meauh/randomizer')),
           onLongPress: () async {
             await Clipboard.setData(
               ClipboardData(text: 'https://github.com/Meauh'),
