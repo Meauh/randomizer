@@ -17,6 +17,12 @@ class ImageResult extends PickerResult {
   const ImageResult(this.url, {this.caption});
 }
 
+class LocalImageResult extends PickerResult {
+  final String name;
+  final String? caption;
+  const LocalImageResult(this.name, {this.caption});
+}
+
 class QuoteResult extends PickerResult {
   final String quote;
   final String author;

@@ -40,7 +40,8 @@ class ColorPickerService implements PickerService {
   @override
   Future<PickerResult> pick() async {
     final random = Random();
-    return TextResult(_colors[random.nextInt(_colors.length)]);//TODO change result to image and add colors images
+    final item = _colors[random.nextInt(_colors.length)];
+    return LocalImageResult(item.value, caption: item.title);
   }
 }
 
@@ -58,7 +59,12 @@ class CoinFlipService implements PickerService {
   @override
   Future<PickerResult> pick() async {
     final random = Random();
-    return TextResult(random.nextBool() ? "Heads" : "Tails"); //TODO change result to image and add coin images
+    final value = random.nextBool();
+    if (value) {
+      return LocalImageResult("tails_coin.png" , caption: "Tails");
+    }else {
+      return LocalImageResult("heads_coin.png" , caption: "Heads");
+    }
   }
 }
 
@@ -201,7 +207,7 @@ class CountryPickerService implements PickerService {
         }
 
         return TextResult(
-          '${countryData['name']['common']} ($capital)\n$currency', //TODO Fix result layout (bad formatting)
+          '${countryData['name']['common']}\n• Capital: $capital\n• Currency: $currency'
         );
       } else {
         throw HttpException('Failed to load country: ${response.statusCode}');

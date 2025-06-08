@@ -1,10 +1,18 @@
 // === DATA CONSTANTS (Configuration) ===
-class DataConstants {
-  static const String defaultPickerMode = "coin";
+import 'package:randomizer/domain/entities/picker_item.dart';
 
-  static const List<String> colors = [
-    "Red", "Blue", "Green", "Yellow", 
-    "Black", "Purple", "Brown", "Orange"
+class DataConstants {
+  static const String defaultPickerMode = "flags";
+
+  static const List<PickerItem> colors = [
+    PickerItem(ResultType.image, "red.png","Red"),
+    PickerItem(ResultType.image, "blue.png","Blue"),
+    PickerItem(ResultType.image, "green.png","Green"),
+    PickerItem(ResultType.image, "yellow.png","Yellow"),
+    PickerItem(ResultType.image, "black.png","Black"),
+    PickerItem(ResultType.image, "purple.png","Purple"),
+    PickerItem(ResultType.image, "brown.png","Brown"),
+    PickerItem(ResultType.image, "orange.png","Orange"),
   ];
   
   static const List<String> emojis = [

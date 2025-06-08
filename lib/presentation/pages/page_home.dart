@@ -153,6 +153,8 @@ class _PageHomeState extends State<PageHome> {
         const SizedBox(height: 16),
         if (_currentResult is ImageResult) ...[
           WidgetImagePick(currentResult: _currentResult),
+        ] else if (_currentResult is LocalImageResult) ...[
+          WidgetLocalImagePick(currentResult: _currentResult),
         ] else ...[
           WidgetTextPick(
             currentResult: _currentResult,
@@ -219,7 +221,7 @@ class _PageHomeState extends State<PageHome> {
         ListTile(
           leading: const Icon(Icons.shop_rounded),
           title: const Text('Next Pick @Playstore'),
-          subtitle: const Text('App Version: 0.1.0'),
+          subtitle: const Text('App Version: 0.2.0'),
           trailing: const Icon(Icons.keyboard_arrow_right_rounded),
           onTap:
               () => launchUrl(
