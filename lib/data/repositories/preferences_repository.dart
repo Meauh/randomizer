@@ -14,11 +14,11 @@ class PreferencesRepository implements IPreferencesRepository {
     try {
       final activeMode = await _service.getActiveMode();
       return UserPreferences(
-        activeMode: activeMode ?? _defaultMode,
+        activeModeId: activeMode ?? _defaultMode,
       );
     } catch (e) {
       // Return default preferences if there's an error
-      return const UserPreferences(activeMode: _defaultMode);
+      return const UserPreferences(activeModeId: _defaultMode);
     }
   }
   

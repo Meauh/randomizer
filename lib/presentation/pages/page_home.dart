@@ -1,62 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:randomizer/domain/entities/user_preferences.dart';
-import 'package:randomizer/domain/usecases/save_active_mode_usecase.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:randomizer/domain/entities/picker_mode.dart';
 import 'package:randomizer/domain/entities/picker_result.dart';
+import 'package:randomizer/domain/entities/user_preferences.dart';
 import 'package:randomizer/domain/usecases/get_picker_modes_usecase.dart';
 import 'package:randomizer/domain/usecases/pick_random_usecase.dart';
 import 'package:randomizer/domain/usecases/get_preferences_usecase.dart';
+import 'package:randomizer/domain/usecases/save_active_mode_usecase.dart';
 import 'package:randomizer/data/repositories/preferences_repository.dart';
 import 'package:randomizer/data/repositories/picker_repository.dart';
 
 import 'package:randomizer/presentation/widgets/next_pick_widget.dart';
 import 'package:randomizer/presentation/widgets/image_pick_widget.dart';
+import 'package:randomizer/presentation/widgets/local_image_pick_widget.dart';
 import 'package:randomizer/presentation/widgets/text_pick_widget.dart';
 import 'package:randomizer/presentation/widgets/picker_mode_widget.dart';
-
-// =========================================================================
-// DOMAIN LAYER - Business Logic & Entities (Independent of external concerns)
-// =========================================================================
-// Files in /domain/
-// File in /core/
-
-// =========================================================================
-// DATA LAYER - External Data Sources & Repository Implementation
-// =========================================================================
-// Files in /data/
-
-// =========================================================================
-// PRESENTATION LAYER - UI Components, Controllers, and State Management
-// =========================================================================
 
 // === UI CONTROLLER (Page State Management) ===
 class _PageHomeState extends State<PageHome> {
   // State variables
   PickerResult? _currentResult;
-  late String _currentModeId = "flag";
+  late String _currentModeId = "numbers";
   bool _isLoading = false;
 
   // Dependencies (injected in real app)
   late final PickRandomUseCase _pickRandomUseCase;
   late final GetPickerModesUseCase _getPickerModesUseCase;
   late final GetPreferencesUseCase _getPreferencesUseCase;
-  late final SaveActiveModeUseCase _setActiveModeUseCase;
-  late final UserPreferences _userPreferences;
+  late final SaveActiveModeUseCase _saveActiveModeUseCase;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
     // Dependency injection would happen here in a real app
-    final pickerRepo = PickerRepository();
-    final prefRepo = PreferencesRepository();
-    _pickRandomUseCase = PickRandomUseCase(pickerRepo);
+    final pickerRepository = PickerRepository();
+    final preferencesRepository = PreferencesRepository();
+
+    _pickRandomUseCase = PickRandomUseCase(pickerRepository);
     _getPickerModesUseCase = GetPickerModesUseCase();
-    _setActiveModeUseCase = SaveActiveModeUseCase(prefRepo);
-    _getPreferencesUseCase = GetPreferencesUseCase(prefRepo);
-    _loadPreferences();
+    _getPreferencesUseCase = GetPreferencesUseCase(preferencesRepository);
+    _saveActiveModeUseCase = SaveActiveModeUseCase(preferencesRepository);
+
+    _loadInitialPreferences();
+  }
+
+  Future<void> _loadInitialPreferences() async {
+    try {
+      final UserPreferences preferences =
+          await _getPreferencesUseCase.execute();
+      setState(() {
+        _currentModeId = preferences.activeModeId;
+        // _isInitializing = false;
+      });
+    } catch (e) {
+      // Handle error and use default
+      setState(() {
+        _currentModeId = 'flags';
+        // _isInitializing = false;
+      });
+    }
   }
 
   // Computed properties
@@ -65,11 +69,6 @@ class _PageHomeState extends State<PageHome> {
   );
 
   // Event handlers
-  Future<void> _loadPreferences() async {
-    _userPreferences = await _getPreferencesUseCase.execute();
-    _currentModeId = _userPreferences.activeMode;
-  }
-
   Future<void> _pickRandom() async {
     setState(() {
       _isLoading = true;
@@ -97,12 +96,20 @@ class _PageHomeState extends State<PageHome> {
     }
   }
 
-  void _changeMode(String modeId) {
+  void _changeMode(String modeId) async {
     setState(() {
       _currentModeId = modeId;
       _currentResult = null;
-      _setActiveModeUseCase.execute(modeId);
     });
+
+    // Save the new active mode to preferences
+    try {
+      await _saveActiveModeUseCase.execute(modeId);
+    } catch (e) {
+      // Handle save error if needed
+      print('Failed to save active mode: $e');
+    }
+
     Navigator.pop(context);
   }
 
@@ -161,24 +168,30 @@ class _PageHomeState extends State<PageHome> {
 
     return ListView(
       children: [
-        DrawerHeader(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Next Pick',
-                style: Theme.of(context).textTheme.headlineSmall,
+        Row(
+          children: [
+            Expanded(
+              child: DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Next Pick',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Choose your picking mode',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Choose your picking mode',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
         ...modes
             .sublist(0, modes.length - 1)

@@ -1,15 +1,15 @@
 class UserPreferences {
-  final String activeMode;
+  final String activeModeId;
   
   const UserPreferences({
-    required this.activeMode,
+    required this.activeModeId,
   });
   
   UserPreferences copyWith({
-    String? activeMode,
+    String? activeModeId,
   }) {
     return UserPreferences(
-      activeMode: activeMode ?? this.activeMode,
+      activeModeId: activeModeId ?? this.activeModeId,
     );
   }
 }
